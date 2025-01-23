@@ -12,10 +12,33 @@ import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import DetailPage from "./pages/DetailPage";
 import AboutPage from './pages/AboutPage';
 import EventPage from './pages/AboutPage/EventPage'
+import CartPage from './pages/CartPage';
+import axios from 'axios';
 
 function App() {
   const [product, setProduct] = useState(data);
+  const [page, setPage] = useState(1);
   let navigate = useNavigate();
+
+  const moreData = () => {
+    axios.get('https://s921132820.github.io/js/shoes_data.json')
+      .then((result) => {
+        const allData = result.data; // 전체 데이터
+        const startIndex = (page - 1) * 3; // 현재 페이지의 시작 인덱스
+        const nextData = allData.slice(startIndex, startIndex + 3); // 3개씩 가져오기
+
+        if (nextData.length > 0) {
+          setProduct([...product, ...nextData]); // 기존 데이터에 추가
+          setPage(page + 1); // 다음 페이지로 이동
+        } else {
+          console.log("더 이상 데이터가 없습니다.");
+        }
+      })
+      .catch(() => {
+        console.log("데이터 가져오기에 실패했습니다.");
+      });
+  };
+
 
   return (
     <div className="App">
@@ -54,7 +77,7 @@ function App() {
           />
           </div>} 
           />
-        <Route path="/cart" element={<div>장바구니 페이지</div>} />
+        <Route path="/cart" element={<div><CartPage /></div>} />
         <Route path="/about" element={<div><AboutPage /></div>}>
           <Route path="member" element={<div>직원소개 페이지</div>}></Route>
           <Route path="location" element={<div>길안내 페이지</div>}></Route>
@@ -76,20 +99,16 @@ function App() {
               product.map((p, index) => {
                 return(
                   <Col>
-                    <Product
-                    product={product}
-                    index={index} 
-                    />
+                    <Product product={product} index={index} />
                   </Col>
                 )
               })
             }
         </Row>
+        <button onClick={moreData}>데이터 가져오기</button>
       </Container>
     </div>
   );
 }
-
-
 
 export default App;
