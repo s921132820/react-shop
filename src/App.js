@@ -3,12 +3,11 @@ import Button from 'react-bootstrap/Button';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import data from './data/shoes-data';
 import { useState } from 'react';
 import Product from "./component/Product";
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import MainPage from './pages/MainPage';
 import DetailPage from "./pages/DetailPage";
 import AboutPage from './pages/AboutPage';
 import EventPage from './pages/AboutPage/EventPage'
@@ -69,8 +68,11 @@ function App() {
 
       {/* 라우터 처리 */}
       <Routes>
-        <Route path="/" element={<div>메인페이지</div>} />
-        <Route index element={<div>홈</div>} />
+        <Route path="/main" element={<div><MainPage product={product} /></div>}>
+        
+        </Route>
+        <Route index element={<MainPage product={product} />}></Route>
+
         <Route path="/detail/:id" element={<div>
           <DetailPage
           product = {product}
@@ -93,20 +95,7 @@ function App() {
         </Route>
       </Routes>
 
-      <Container>
-        <Row className="justify-content-md-center">
-            {
-              product.map((p, index) => {
-                return(
-                  <Col>
-                    <Product product={product} index={index} />
-                  </Col>
-                )
-              })
-            }
-        </Row>
-        <button onClick={moreData}>데이터 가져오기</button>
-      </Container>
+
     </div>
   );
 }
