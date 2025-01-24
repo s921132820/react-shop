@@ -7,6 +7,9 @@ import Tabs from 'react-bootstrap/Tabs';
 import axios from 'axios';
 import { useDispatch, useSelector } from "react-redux";
 import { addCart, setReviews } from "../../store";
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 function DetailPage(props) {
   let [alert, setAlert] = useState(true);
@@ -59,22 +62,21 @@ function DetailPage(props) {
   };
 
   return (
-    <div className="container">
-      <div className="row">
-        <div className="col-md-6"></div>
+    <Container>
+      <Row>
+        <Col sm={8}>
         <img src={process.env.PUBLIC_URL + shoesImage} />
-      
-
         {
           alert == true ? <Discount /> : null
         }
+        </Col>
       
-        <div className="col-md-6">
+        <Col sm={4}>
           <h4 className="pt-5">{props.product[id].title}</h4>
           <p>{props.product[id].content}</p>
           <p>{strPrice}원</p>
           <button className="btn btn-danger" onClick={handleOrder}>주문하기</button>
-        </div>
+        </Col>
 
         <Tabs
         defaultActiveKey="profile"
@@ -118,8 +120,8 @@ function DetailPage(props) {
             Tab content for Contact
           </Tab>
         </Tabs>
-      </div>  
-    </div>
+      </Row>  
+    </Container>
   )
 }
 

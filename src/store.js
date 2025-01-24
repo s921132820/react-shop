@@ -23,6 +23,7 @@ let cartData = createSlice({
         item.count--;
       }
     },
+    // 장바구니에 상품 추가
     addCart(state, action) {
       const product = action.payload;
       const existItem = state.find((item) => item.id === product.id);
@@ -33,6 +34,7 @@ let cartData = createSlice({
         state.push({... product, count : 1});
       }
     },
+    // 장바구니에 있는 상품 삭제
     deleteCart(state, action) {
       const productId = action.payload;
       const updatedState = state.filter((item) => item.id !== productId);

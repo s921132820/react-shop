@@ -4,7 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import data from './data/shoes-data';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Product from "./component/Product";
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import MainPage from './pages/MainPage';
@@ -12,12 +12,23 @@ import DetailPage from "./pages/DetailPage";
 import AboutPage from './pages/AboutPage';
 import EventPage from './pages/AboutPage/EventPage'
 import CartPage from './pages/CartPage';
+import RecentPage from './pages/RecentPage';
 import axios from 'axios';
 
 function App() {
+  // localStorage에 초기 설정
+  // useEffect(()=>{
+  //   localStorage.setItem('recent',JSON.stringify([]))
+  // }, [])
+
   const [product, setProduct] = useState(data);
   const [page, setPage] = useState(1);
   let navigate = useNavigate();
+
+  // localStorage
+  let outData = localStorage.getItem('data');
+  console.log(JSON.parse(outData));
+  localStorage.setItem('data', JSON.stringify(product))
 
   const moreData = () => {
     axios.get('https://s921132820.github.io/js/shoes_data.json')
@@ -43,13 +54,17 @@ function App() {
     <div className="App">
       <Navbar bg="dark" data-bs-theme="dark">
         <Container>
-          <Navbar.Brand href="#home">ShoeShop</Navbar.Brand>
+          <Navbar.Brand href="/">ShoeShop</Navbar.Brand>
           <Nav className="me-auto">
             <Nav.Link onClick={()=>
               navigate("/")
             }>
-              {/* <Link to={"/"}>Home</Link> */}
               Home
+            </Nav.Link>
+            <Nav.Link onClick={()=>
+              navigate("/recent")
+            }>
+              최근 본 상품
             </Nav.Link>
             <Nav.Link onClick={()=>
               navigate("/cart")
@@ -79,6 +94,7 @@ function App() {
           />
           </div>} 
           />
+        <Route path="/recent" element={<div><RecentPage product={product} /></div>} />
         <Route path="/cart" element={<div><CartPage /></div>} />
         <Route path="/about" element={<div><AboutPage /></div>}>
           <Route path="member" element={<div>직원소개 페이지</div>}></Route>
