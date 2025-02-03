@@ -1,12 +1,10 @@
 import './App.css';
-import Button from 'react-bootstrap/Button';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import data from './data/shoes-data';
 import { useEffect, useState } from 'react';
-import Product from "./component/Product";
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import MainPage from './pages/MainPage';
 import DetailPage from "./pages/DetailPage";
 import AboutPage from './pages/AboutPage';
@@ -14,13 +12,12 @@ import EventPage from './pages/AboutPage/EventPage'
 import CartPage from './pages/CartPage';
 import RecentPage from './pages/RecentPage';
 import axios from 'axios';
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
+
+// 구글 로그인 상태 여부 파악해주는 기능
+import { onAuthStateChanged } from 'firebase/auth';
 
 function App() {
-  // localStorage에 초기 설정
-  // useEffect(()=>{
-  //   localStorage.setItem('recent',JSON.stringify([]))
-  // }, [])
-
   const [product, setProduct] = useState(data);
   const [page, setPage] = useState(1);
   let navigate = useNavigate();
@@ -29,6 +26,30 @@ function App() {
   let outData = localStorage.getItem('data');
   console.log(JSON.parse(outData));
   localStorage.setItem('data', JSON.stringify(product))
+
+  // localStorage에 초기 설정
+  // useEffect(()=>{
+  //   localStorage.setItem('recent',JSON.stringify([]))
+  // }, [])
+
+  const auth = getAuth();
+  const provider = new GoogleAuthProvider();
+
+  // 구글 로그인 상태 저장 스테이트
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if(user) {
+        setUserInfo(user)
+        console.log("====login success : " , userInfo)
+      } else {
+        console.log("====logout success : ", userInfo)
+      }
+    })
+  }, [auth, navigate, userInfo])
+
+
 
   const moreData = () => {
     axios.get('https://s921132820.github.io/js/shoes_data.json')
@@ -49,6 +70,25 @@ function App() {
       });
   };
 
+  // 로그인
+  function firebaseLogin() {
+    signInWithPopup(auth, provider)
+    .then((result) => {
+
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
+
+  // 로그아웃
+  function firebaseLogout() {
+    signOut(auth).then(() => {
+      setUserInfo(null);
+      navigate("/")
+    }).catch((error) => {
+      console.log(error)
+    });
+  }
 
   return (
     <div className="App">
@@ -64,18 +104,34 @@ function App() {
             <Nav.Link onClick={()=>
               navigate("/recent")
             }>
-              최근 본 상품
+              Recent
             </Nav.Link>
-            <Nav.Link onClick={()=>
-              navigate("/cart")
-              } >
-                Cart
-            </Nav.Link>
+            {
+              userInfo === null ?
+              null : 
+              <Nav.Link onClick={()=>
+                navigate("/cart")
+                } >
+                  Cart
+              </Nav.Link>
+            }
             <Nav.Link onClick={()=>
               navigate("/about")
               } >
                 About
             </Nav.Link>
+          </Nav>
+          <Nav>
+            {
+              userInfo === null ?
+              <Nav.Link onClick={firebaseLogin}>Login</Nav.Link> :
+              (
+              <div className='userInfoArea'>
+                <span>{userInfo.displayName}</span>
+                <img src={userInfo.photoURL} className='userImage'></img>
+                <Nav.Link onClick={firebaseLogout}>Logout</Nav.Link>
+              </div>
+            )}
           </Nav>
         </Container>
       </Navbar> 
